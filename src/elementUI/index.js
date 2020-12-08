@@ -3,8 +3,12 @@ import {
   Submenu,
   MenuItem,
   Upload,
+  Timeline,
+  TimelineItem,
   MenuItemGroup,
   Option,
+  Radio,
+  RadioGroup,
   OptionGroup,
   Input,
   Tree,
@@ -20,6 +24,10 @@ const element = {
     Vue.use(Submenu);
     Vue.use(MenuItem);
     Vue.use(MenuItemGroup);
+    Vue.use(Timeline);
+    Vue.use(TimelineItem);
+    Vue.use(Radio);
+    Vue.use(RadioGroup);
     Vue.use(Upload);
     Vue.use(Button);
     Vue.use(Option);

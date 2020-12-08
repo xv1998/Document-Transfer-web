@@ -1,13 +1,14 @@
 <template>
   <div class="tem_bd">
-    <Nav v-model="actId" class="nav_bd"/>
+    <Nav v-model="actId" class="nav_bd" @change="changeNav"/>
     <keep-alive>
-      <router-view />
+      <router-view class="content_bd"/>
     </keep-alive>
   </div>
 </template>
 <script>
 import Nav from '../components/Nav';
+import { NAV_SEND, NAV_LABEL, NAV_ANCHOR} from '../common/constants';
 export default {
   name: "home",
   components: {
@@ -18,13 +19,17 @@ export default {
       actId: "1",
     };
   },
-  watch:{
-    actId(val){
-      console.log("切换",val)
+  methods: {
+    changeNav(val = '1') {
+      let name = NAV_LABEL[~~val] || NAV_SEND;
+      this.$router.replace({
+        name
+      })
     }
   },
-  methods: {
-  },
+  mounted(){
+    this.actId = `${NAV_ANCHOR[this.$route.name]}` || '1';
+  }
 };
 </script>
 <style scoped>
@@ -39,5 +44,8 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+.content_bd{
+  padding: 20px;
 }
 </style>
