@@ -42,10 +42,12 @@
 </template>
 
 <script>
+// import qs from "qs";
+
 const SIZE = 1024 * 1024 * 2; // 切片大小 2M
 
 export default {
-  name: 'FileUpload',
+  name: "FileUpload",
   data() {
     return {
       labelCol: { span: 4 },
@@ -56,11 +58,12 @@ export default {
       status: "active",
       form: {
         file: [],
-        worker: null
+        worker: null,
+        fid: null,
       },
       rules: {
         file: [{ required: true, message: "请选择文件", trigger: "submit" }],
-      }
+      },
     };
   },
   mounted() {},
@@ -68,7 +71,7 @@ export default {
   methods: {
     beforeUpload(file) {
       this.form.file = [...this.form.file, file];
-      console.log("获取到的文件",this.form.file)
+      console.log("获取到的文件", this.form.file);
       return false;
     },
     // 创建文件切片
@@ -84,13 +87,13 @@ export default {
     // 计算切片hash值
     calculateHash(fileChunkList) {
       return new Promise((resolve) => {
-        console.time()
+        console.time();
         this.form.worker = new Worker("/hash.js");
         this.form.worker.postMessage({ fileChunkList });
         this.form.worker.onmessage = (e) => {
           const { hash } = e.data;
           if (hash) {
-            console.timeEnd()
+            console.timeEnd();
             resolve(hash);
           }
         };
@@ -106,32 +109,45 @@ export default {
         fileName: file.name,
       }));
       console.log("切片信息：", list, this.form, fileChunkList);
-      const fileExit = await this.verifyUpload(file.name,hash);
-      if(!fileExit){
+      const fileExit = await this.verifyUpload(file.name, hash);
+      this.show = true;
+      this.status = "active";
+      if (!fileExit) {
         await this.uploadChunks(list);
-        await this.mergeRequest(hash, file.name);
-      }else {
-        this.show = true;
-        this.status = "active";
+        await this.mergeRequest(hash, file.name, this.form.fid);
+      } else {
         this.percent = 100;
-        this.clock = setTimeout(()=> {
+        this.clock = setTimeout(() => {
           this.resetProgress();
-          this.resetForm()
-        }, 1000)
+          this.resetForm();
+        }, 1000);
+      }
+    },
+    async getUpid() {
+      const {
+        data: { code: code, data: data },
+      } = await this.$axios.get("/file/getupid");
+      if (code === 0) {
+        this.form.fid = data.fid;
+      } else {
+        this.$message.error("生成文件id失败", 10);
+        throw new Error("生成文件id失败")
       }
     },
     // 上传前验证是否之前已上传过
     async verifyUpload(filename, filehash) {
-      const {data: { isExit : exit}} = await this.$axios.get("/file/verify", {
+      const {
+        data: { isExit: exit },
+      } = await this.$axios.get("/file/verify", {
         params: {
           hash: filehash,
           fileName: filename,
         },
       });
-      if(exit){
+      if (exit) {
         this.percent = 100;
-        return true
-      }else return false
+        return true;
+      } else return false;
     },
     // 上传切片
     async uploadChunks(list = []) {
@@ -145,8 +161,9 @@ export default {
           return { formData };
         })
         .map(async ({ formData }) => {
-          this.$axios.post("/file/upload", formData, {
-            onUploadProgress: (progressEvent) => {
+          this.$axios
+            .post("/file/upload", formData, {
+              onUploadProgress: (progressEvent) => {
                 if (progressEvent.lengthComputable) {
                   var complete =
                     ((progressEvent.loaded / progressEvent.total) * 100) | 0;
@@ -155,9 +172,9 @@ export default {
                     this.resetProgress();
                   }
                 }
-              }
-          })
-          .then((res) => {
+              },
+            })
+            .then((res) => {
               if (res.data.code === 0) {
                 this.resetForm();
                 this.$message.success(res.data.message);
@@ -166,17 +183,16 @@ export default {
               }
             });
         });
-      this.status = "active";
-      this.show = true;
       await Promise.all(formList); // 并发上传
     },
     // 合并请求
-    async mergeRequest(hash = "", fileName = "") {
+    async mergeRequest(hash = "", fileName = "", fid = "") {
       this.$axios
         .get("/file/merge", {
           params: {
             hash,
             fileName,
+            fid
           },
         })
         .then((res) => {
@@ -184,36 +200,34 @@ export default {
         });
     },
     onSubmit() {
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs.ruleForm.validate(async (valid) => {
         if (valid) {
+          await this.getUpid(this.form.file);
           this.form.file.forEach(item => {
-            this.handleUpload(item)
+            this.handleUpload(item.originFileObj)
           })
         }
-      })
+      });
     },
-    handleChange() {
-      // let fileList = [...info.fileList];
-      //  Limit the number of uploaded files
-      //    Only to show two recent uploaded files, and old ones will be replaced by the new
-      // fileList = fileList.slice(-1);
-
-      // this.form.file = fileList;
+    handleChange(info) {
+      let fileList = [...info.fileList];
+      this.form.file = fileList;
     },
     previewFile() {
       return false;
     },
     resetForm() {
       this.$refs.ruleForm.resetFields();
+      console.log("重设", this.form)
     },
     resetProgress() {
       this.show = false;
       this.percent = 0;
     },
   },
-  beforeDestroy(){
+  beforeDestroy() {
     clearTimeout(this.clock);
     this.clock = null;
-  }
+  },
 };
 </script>

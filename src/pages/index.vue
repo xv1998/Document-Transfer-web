@@ -23,7 +23,6 @@
 
 <script>
 import Header from "../components/common/Header";
-// import Footer from "../components/Footer";
 import Sidebar from "../components/common/Sidebar";
 
 export default {
@@ -42,15 +41,13 @@ export default {
     },
   components: {
     Header,
-    // Footer,
     Sidebar
   },
 
   data() {
     return {
       thisOpenKeys:this.openKeys,
-      thisSelectedKeys: this.selectedKeys,
-
+      thisSelectedKeys: this.selectedKeys
       };
 
     }

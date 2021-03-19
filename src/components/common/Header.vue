@@ -14,7 +14,7 @@
                 <router-link :to="{ path: 'upload'}">
                   <a-icon type="home" />
                   文件上传
-                </router-link>   
+                </router-link>
               </a-menu-item>
               <a-menu-item key="2">
                 <router-link :to="{ path: 'download'}">
