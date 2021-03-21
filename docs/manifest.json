@@ -1,1 +1,20 @@
-{"name":"File-Transfer","short_name":"File-Transfer","theme_color":"#4DBA87","icons":[{"src":"/img/icons/android-chrome-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/img/icons/android-chrome-512x512.png","sizes":"512x512","type":"image/png"}],"start_url":"/","display":"standalone","background_color":"#000000"}
+{
+  "name": "File-Transfer",
+  "short_name": "File-Transfer",
+  "theme_color": "#4DBA87",
+  "icons": [
+    {
+      "src": "https://xv1998.github.io/Document-Transfer-web/img/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://xv1998.github.io/Document-Transfer-web/img/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "https://xv1998.github.io/Document-Transfer-web/",
+  "display": "standalone",
+  "background_color": "#000000"
+}
