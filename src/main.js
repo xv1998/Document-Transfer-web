@@ -6,6 +6,7 @@ import Andt from 'ant-design-vue'
 import App from './App.vue'
 import { router } from './router';
 import axios from 'axios';
+import './registerServiceWorker'
 // import VueAxios from 'vue-axios'
 
 Vue.config.productionTip = false

@@ -2,7 +2,7 @@
   <a-layout>
     <a-layout-header style="background: #fff; padding: 0">
       <a-row>
-        <a-col :xs="{ span: 16, offset: 2 }" :sm="{ span: 32, offset: 1 }">
+        <a-col :xs="{ span: 18, offset: 2 }" :sm="{ span: 32, offset: 1 }">
           <a-col>
             <a-menu
               theme="light"

@@ -6,10 +6,10 @@
         :style="{width:'90%', margin: 'auto', marginTop: '20px'}"
       >
         <a-row>
-          <a-col :span="5">
+          <!-- <a-col :span="5">
             <Sidebar :selectedKeys="thisSelectedKeys" :open-keys="thisOpenKeys" />
-          </a-col>
-          <a-col :span="18">
+          </a-col> -->
+          <a-col>
             <a-layout-content :style="{backgroundColor: 'white', minHeight: '578px', marginLeft: '20px'}">
               <router-view></router-view>
             </a-layout-content>
@@ -23,7 +23,7 @@
 
 <script>
 import Header from "../components/common/Header";
-import Sidebar from "../components/common/Sidebar";
+// import Sidebar from "../components/common/Sidebar";
 
 export default {
   name: "index",
@@ -41,7 +41,7 @@ export default {
     },
   components: {
     Header,
-    Sidebar
+    // Sidebar
   },
 
   data() {
