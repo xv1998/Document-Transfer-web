@@ -27,9 +27,9 @@ module.exports = {
     workboxPluginMode: 'InjectManifest',
     workboxOptions: {
       // swSrc is required in InjectManifest mode.
-      swSrc: 'src/service-worker.js',
+      swSrc: 'public/sw.js',
       importWorkboxFrom: 'disabled',
-      importScripts: 'https://storage.googleapis.com/workbox-cdn/releases/3.0.0-alpha.3/workbox-sw.js'
+      importScripts: 'https://storage.googleapis.com/workbox-cdn/releases/6.1.1/workbox-sw.js'
       // ...other Workbox options...
     }
   }

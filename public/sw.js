@@ -1,4 +1,12 @@
 // 设置相应缓存的名字的前缀和后缀
+if (workbox) {
+  console.log(`Yay! Workbox is loaded 🎉`,workbox);
+} else {
+  console.log(`Boo! Workbox didn't load 😬`);
+}
+workbox.loadModule('workbox-strategies');
+
+
 workbox.core.setCacheNameDetails({
   prefix: 'file-transfer',
   suffix: 'v1.0.0',
@@ -15,7 +23,7 @@ workbox.routing.registerRoute(
   // Cache CSS files
   /.*\.css/,
   // 使用缓存，但尽快在后台更新
-  workbox.strategies.staleWhileRevalidate({
+  self.strategies.staleWhileRevalidate({
     // 使用自定义缓存名称
     cacheName: 'css-cache'
   })

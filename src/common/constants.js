@@ -12,3 +12,10 @@ export const NAV_LABEL = {
   2: NAV_DOWNLOAD,
   3: NAV_RECORD,
 }
+
+export const LEN_TAG = {
+  0: 'b',
+  1: 'Kb',
+  2: 'Mb',
+  3: 'G'
+}

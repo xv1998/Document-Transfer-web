@@ -1,11 +1,8 @@
 <template>
-  <div>
-    <a-layout>
-      <Content>
-        <template v-slot:content>
-          <a-back-top />
+  <a-row>
+    <a-col :span="24" :style="{ marginTop: '36px' }"> </a-col>
           <a-row>
-            <a-col :span="12">
+            <a-col :xs="{ span: 20 }" :sm="{ span: 32, offset: 1 }">
               <a-input-search
                 placeholder="请输入提取码"
                 v-model="code"
@@ -32,7 +29,7 @@
                     item.fileName
                   }}</span>
                   <span :style="{ marginRight: '10px' }">{{
-                    item.cid
+                    parseFileSize(item.size)
                   }}</span>
                   <a-icon
                     type="download"
@@ -45,24 +42,22 @@
               </div>
               <a-list-item-meta>
                 <a slot="title"
-                  ><a-tag>jpg</a-tag> {{ item.filename }}</a
+                  ><a-tag>{{parseTag(item.filename)}}</a-tag> {{ item.filename }}</a
                 >
               </a-list-item-meta>
             </a-list-item>
           </a-list>
-        </template>
-      </Content>
-    </a-layout>
-  </div>
+  </a-row>
 </template>
 <script>
-import Content from "./common/Content";
+// import Content from "./common/Content";
+import {LEN_TAG} from '../common/constants'
 import qs from "qs";
-
+const SIZE = 1024;
 export default {
   name: "Download",
   components: {
-    Content,
+    // Content,
   },
   mounted() {},
   data() {
@@ -82,6 +77,20 @@ export default {
     async handleSearch() {
       await this.getFileListData();
       this.loading = false;
+    },
+    parseTag(name){
+      return (name.match(/(?<=\.)(\w+)/g) || []).slice(-1)[0];
+    },
+    parseFileSize(len = ''){
+      let size = 0;
+      let count = 0;
+      let length = +len;
+      while(length > SIZE ){
+        size = (length / SIZE).toFixed(1);
+        length /= SIZE;
+        count++;
+      }
+      return size + LEN_TAG[count];
     },
     getFileListData() {
       return new Promise((resolve, reject) => {

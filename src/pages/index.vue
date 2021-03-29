@@ -10,7 +10,7 @@
             <Sidebar :selectedKeys="thisSelectedKeys" :open-keys="thisOpenKeys" />
           </a-col> -->
           <a-col>
-            <a-layout-content :style="{backgroundColor: 'white', minHeight: '578px', marginLeft: '20px'}">
+            <a-layout-content :style="{backgroundColor: 'white', minHeight: '578px', padding: '0 20px'}">
               <router-view></router-view>
             </a-layout-content>
           </a-col>
