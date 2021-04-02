@@ -75,8 +75,21 @@ export default {
   },
   methods: {
     async handleSearch() {
-      await this.getFileListData();
-      this.loading = false;
+      if(this.checkCode()){
+        await this.getFileListData();
+        this.loading = false;
+      }
+    },
+    checkCode(){
+      let code = this.code;
+      if(!code){
+        this.$message.error("请填写提取码");
+        return false;
+      }else if(code.match(/[^0-9a-z]/g)){
+        this.$message.error("请正确格式的提取码");
+        return false;
+      }
+      return true;
     },
     parseTag(name){
       return (name.match(/(?<=\.)(\w+)/g) || []).slice(-1)[0];
@@ -92,22 +105,17 @@ export default {
       }
       return size + LEN_TAG[count];
     },
-    getFileListData() {
-      return new Promise((resolve, reject) => {
-        (this.loading = true),
-          this.$axios
-            .post("/file/getlist", qs.stringify({ fid: this.code}))
-            .then(({data: {code, data, message}}) => {
-              if(code !== 0) reject(message);
-              console.log("文件列表", data.list)              
-              this.listData = data.list || [];
-              resolve();
-            })
-            .catch((err) => {
-              console.log(err);
-              reject();
-            });
-      });
+    async getFileListData() {
+      this.loading = true;
+      try{
+        const { list } = await this.$axios.post("/file/getlist", qs.stringify({ fid: this.code}));
+        this.listData = list || [];
+      }catch(e){
+        this.$message.error("获取列表失败");
+        throw new Error(e);
+      }finally {
+        this.loading = false;
+      }
     },
     getFileId(id) {
       return this.listData.filter((r) => {
@@ -121,14 +129,13 @@ export default {
           "/file/download?code=" +
           encodeURIComponent(id),
         responseType: "blob",
-      }).then((res) => {
+      }).then(({res,headers}) => {
         // 接收文件流，触发浏览器下载行为
-        console.log("下载完成", res);
-        const content = res.data;
+        const content = res;
         const blob = new Blob([content], {
           type: "application/actet-stream;charset=utf-8",
         });
-        const contentDisposition = res.headers["content-disposition"];
+        const contentDisposition = headers["content-disposition"];
         var patt = new RegExp("filename=([^;]+\\.[^\\.;]+);*");
         var result = patt.exec(contentDisposition);
         var fileName = decodeURIComponent(result[1] || "");

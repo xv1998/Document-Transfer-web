@@ -1,8 +1,8 @@
 <template>
   <a-layout>
-    <a-layout-header style="background: #fff; padding: 0">
+    <a-layout-header style="background: #fff; padding: 0;box-shadow:0 1px 5px 0 rgb(0 0 0 / 15%)">
       <a-row>
-        <a-col :xs="{ span: 18, offset: 2 }" :sm="{ span: 32, offset: 1 }">
+        <a-col :xs="{ span: 18, offset: 2 }" :sm="{ span: 23, offset: 1 }">
           <a-col>
             <a-menu
               theme="light"

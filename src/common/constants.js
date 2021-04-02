@@ -19,3 +19,7 @@ export const LEN_TAG = {
   2: 'Mb',
   3: 'G'
 }
+
+export const CODE_TAG = {
+  success: 0
+}
