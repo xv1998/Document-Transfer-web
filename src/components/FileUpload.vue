@@ -54,6 +54,10 @@
         </div>
       </div>
     </a-col>
+    <a-modal :visible="modal1Visible" ok-text="复制提取码" cancel-text="取消" @ok="handleCopyCode">
+      <p>提取码：{{form.fid}}</p>
+      文件有效时：<CountDown :endTime="form.time" />
+    </a-modal>
     <!-- <div class="cube-container" :style="{width:cubeWidth+'px'}">
         <div class="cube" 
           v-for="chunk in chunks" 
@@ -75,10 +79,11 @@
 </template>
 
 <script>
+import CountDown from './CountDown'
 // import qs from "qs";
 const SIZE = 1024 * 1024 * 2; // 切片大小 2M
 
-const Status = {
+const Status = { 
   wait: "wait",
   pause: "pause",
   uploading: "uploading",
@@ -87,11 +92,15 @@ const Status = {
 };
 export default {
   name: "FileUpload",
+  components:{
+    CountDown
+  },
   data() {
     return {
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
       show: false,
+      modal1Visible: false,
       clock: null,
       chunks: [],
       form: {
@@ -100,6 +109,7 @@ export default {
         fid: null,
         size: 0,
         pwd: "",
+        time: new Date().getTime() + 3600000
       },
       rules: {
         file: [{ required: true, message: "请选择文件", trigger: "submit" }],
@@ -123,26 +133,22 @@ export default {
         .map((item) => item.size * item.progress)
         .reduce((acc, cur) => acc + cur);
       let num = parseInt((loaded / this.form.size).toFixed(2));
-      if (num === 100) {
-        this.showTips();
+      if (num === 100 && this.form.time) {
+        this.ModalVisibleChange();
       }
       return num;
     },
   },
-  mounted() {},
 
   methods: {
-    showTips() {
-      this.$info({
-        title: "提取码：",
-        content: this.form.fid,
-        okText: "复制提取码",
-        onOk: () => {
-          navigator.clipboard.writeText(this.form.fid);
-          this.resetForm();
-          this.resetProgress();
-        },
-      });
+    ModalVisibleChange(){
+      this.modal1Visible = true;
+    },
+    handleCopyCode(){
+      navigator.clipboard.writeText(this.form.fid);
+      this.modal1Visible = false;
+      this.resetForm();
+      this.resetProgress();
     },
     getRandomNum(max, min) {
       return Math.floor(Math.random() * (max - min)) + min;
@@ -324,7 +330,7 @@ export default {
       { fid = "", pwd = "" }
     ) {
       try {
-        await this.$axios.get("/file/merge", {
+        const {time} = await this.$axios.get("/file/merge", {
           params: {
             hash,
             fileName,
@@ -333,6 +339,7 @@ export default {
             pwd,
           },
         });
+        this.form.time = time*1000;
       } catch (e) {
         this.$message.error("上传失败");
         throw new Error(e);
@@ -364,6 +371,8 @@ export default {
         worker: null,
         fid: null,
         size: 0,
+        pwd: "",
+        time: 0
       };
       this.resetProgress();
       console.log("重设", this.form);
