@@ -54,7 +54,7 @@
         </div>
       </div>
     </a-col>
-    <a-modal :visible="modal1Visible" ok-text="复制提取码" cancel-text="取消" @ok="handleCopyCode">
+    <a-modal :visible="modal1Visible" ok-text="复制提取码" cancel-text="取消" @ok="handleCopyCode" @cancel="handleCancel">
       <p>提取码：{{form.fid}}</p>
       文件有效时：<CountDown :endTime="form.time" />
     </a-modal>
@@ -103,6 +103,7 @@ export default {
       modal1Visible: false,
       clock: null,
       chunks: [],
+      chunksLength: 0,
       form: {
         file: [],
         worker: null,
@@ -150,6 +151,11 @@ export default {
       this.resetForm();
       this.resetProgress();
     },
+    handleCancel() {
+      this.modal1Visible = false;
+      this.resetForm();
+      this.resetProgress();
+    },
     getRandomNum(max, min) {
       return Math.floor(Math.random() * (max - min)) + min;
     },
@@ -183,6 +189,7 @@ export default {
       if (progressEvent.lengthComputable) {
         var complete = ((progressEvent.loaded / progressEvent.total) * 100) | 0;
         item.progress = parseInt(complete);
+        console.log("测试",this.chunks, item, complete);
       }
     },
     // 计算切片hash值
@@ -208,10 +215,11 @@ export default {
         hash,
         chunkHash: hash + "-" + index,
         fileName: file.name,
-        index: index + this.chunks.length,
+        index: index + this.chunksLength,
         size: chunk.size,
         progress: 0,
       }));
+      this.chunksLength += fileChunkList.length;
       const fileExit = await this.verifyUpload(file.name, hash);
       if (fileExit) {
         list.forEach((item) => {
@@ -227,7 +235,10 @@ export default {
     },
     async getUpid() {
       try {
-        const { fid } = await this.$axios.get("/file/getupid");
+        const { fid } = await this.$axios.get("/file/getupid", {
+          params: {
+            pwd: this.form.pwd,
+          }});
         this.form.fid = fid;
       } catch (e) {
         this.$message.error("文件上传失败");
@@ -237,13 +248,14 @@ export default {
     // 上传前验证是否之前已上传过
     async verifyUpload(filename, filehash) {
       try {
-        const { isExit } = await this.$axios.get("/file/verify", {
+        const { time, isExit } = await this.$axios.get("/file/verify", {
           params: {
             hash: filehash,
             fileName: filename,
             fid: this.form.fid,
           },
         });
+        this.form.time = time;
         return isExit;
       } catch (e) {
         this.$message.error("文件上传失败");
@@ -339,7 +351,7 @@ export default {
             pwd,
           },
         });
-        this.form.time = time*1000;
+        this.form.time = time;
       } catch (e) {
         this.$message.error("上传失败");
         throw new Error(e);
@@ -366,6 +378,7 @@ export default {
     resetForm() {
       this.$refs.ruleForm.resetFields();
       this.chunks = [];
+      this.chunksLength = 0;
       this.form = {
         file: [],
         worker: null,

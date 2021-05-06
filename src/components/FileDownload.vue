@@ -47,6 +47,9 @@
               </a-list-item-meta>
             </a-list-item>
           </a-list>
+    <a-modal :visible="modal1Visible" title="访问需要密码" ok-text="确认" cancel-text="取消" @ok="handleInput" @cancel="handleCancel">
+      <a-input placeholder="请输入" allow-clear v-model="pwd"/>
+    </a-modal>
   </a-row>
 </template>
 <script>
@@ -62,6 +65,7 @@ export default {
   mounted() {},
   data() {
     return {
+      modal1Visible: false,
       listData: [],
       loading: false,
       pagination: {
@@ -71,9 +75,19 @@ export default {
         pageSize: 8,
       },
       code: "",
+      pwd: ""
     };
   },
   methods: {
+    handleCancel(){
+      this.modal1Visible = false;
+      this.pwd = "";
+    },
+    async handleInput(){
+      await this.getFileListData();
+      this.loading = false;
+      this.modal1Visible = false;
+    },
     async handleSearch() {
       if(this.checkCode()){
         await this.getFileListData();
@@ -108,10 +122,14 @@ export default {
     async getFileListData() {
       this.loading = true;
       try{
-        const { list } = await this.$axios.post("/file/getlist", qs.stringify({ fid: this.code}));
-        this.listData = list || [];
+        const { list, needPwd } = await this.$axios.post("/file/checkpwd", qs.stringify({ fid: this.code, pwd: this.pwd}));
+        if(needPwd && !list){
+          this.modal1Visible = true
+        }else {
+          this.listData = list || [];
+        }
       }catch(e){
-        this.$message.error("获取列表失败");
+        this.$message.error(e);
         throw new Error(e);
       }finally {
         this.loading = false;

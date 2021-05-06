@@ -26,8 +26,8 @@ export default {
     }
   },
   watch:{
-    endTime(){
-      console.log('aaaaaaaaaa')
+    endTime(item){
+      console.log('aaaaaaaaaa',item)
       if(this.clock){
         clearInterval(this.clock);
       }
@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     timeDown() {
-      const endTime = new Date(this.endTime);
+      const endTime = new Date(this.endTime*1000);
       const nowTime = new Date();
       let leftTime = parseInt((endTime.getTime() - nowTime.getTime()) / 1000);
       let h = this.formate(parseInt((leftTime / (60 * 60)) % 24));
