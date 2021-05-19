@@ -136,6 +136,7 @@ export default {
       let num = parseInt((loaded / this.form.size).toFixed(2));
       if (num === 100 && this.form.time) {
         this.ModalVisibleChange();
+        console.timeEnd("upload");
       }
       return num;
     },
@@ -189,7 +190,6 @@ export default {
       if (progressEvent.lengthComputable) {
         var complete = ((progressEvent.loaded / progressEvent.total) * 100) | 0;
         item.progress = parseInt(complete);
-        console.log("测试",this.chunks, item, complete);
       }
     },
     // 计算切片hash值
@@ -224,6 +224,7 @@ export default {
       if (fileExit) {
         list.forEach((item) => {
           item.progress = 100;
+          item.status = Status.done;
         });
       }
       this.chunks.push(...list);
@@ -360,6 +361,7 @@ export default {
     onSubmit() {
       this.$refs.ruleForm.validate(async (valid) => {
         if (valid) {
+          console.time("upload");
           await this.getUpid(this.form.file);
           this.form.file.forEach((item) => {
             this.form.size += item.originFileObj.size;
